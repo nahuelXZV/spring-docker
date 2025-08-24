@@ -43,7 +43,7 @@ pipeline {
         stage('Validate Deployment') {
             steps {
                 sh 'sleep 10'
-                sh 'curl --fail http://maven-ssh:8080/health'
+                sh 'curl --fail http://maven-ssh:8080'
             }
         }
     }
