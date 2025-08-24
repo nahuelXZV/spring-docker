@@ -3,11 +3,12 @@ pipeline {
     environment {
         STAGING_SERVER = 'dockeruser@maven-ssh'
         ARTIFACT_NAME = 'demo-0.0.1-SNAPSHOT.jar'
+        REMOTE_PATH = '/home/dockeruser/projects'
     }
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/nahuelXZV/spring-docker/'
+                git 'https://github.com/nahuelXZV/spring-docker'
             }
         }
         stage('Build') {
@@ -32,14 +33,14 @@ pipeline {
         }
         stage('Deploy to Staging') {
             steps {
-                sh 'scp target/${ARTIFACT_NAME} $STAGING_SERVER:/home/your-user/staging/'
-                sh 'ssh $STAGING_SERVER "nohup java -jar /home/your-user/staging/${ARTIFACT_NAME} > /dev/null 2>&1 &"'
+                sh 'scp target/${ARTIFACT_NAME} $STAGING_SERVER:${REMOTE_PATH}/'
+                sh 'ssh $STAGING_SERVER "nohup java -jar ${REMOTE_PATH}/${ARTIFACT_NAME} > ${REMOTE_PATH}/app.log 2>&1 &"'
             }
         }
         stage('Validate Deployment') {
             steps {
                 sh 'sleep 10'
-                sh 'curl --fail http://your-staging-server:8080/health'
+                sh 'curl --fail http://maven-ssh:8080/health'
             }
         }
     }
