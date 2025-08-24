@@ -1,25 +1,48 @@
 pipeline {
-  agent any
-  environment {
-    IMAGE_NAME = "demo-ci-cd:latest"
-  }
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    agent any
+    environment {
+        PATH = "/opt/maven/bin:$PATH"
+        STAGING_SERVER = 'dockeruser@maven-ssh'
+        ARTIFACT_NAME = 'demo-0.0.1-SNAPSHOT.jar'
+        REMOTE_PATH = '/home/dockeruser/projects'
     }
-    stage('Build & Test') {
-      steps {
-        sh 'mvn -B clean package'
-      }
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/nahuelXZV/spring-docker'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+        stage('Code Quality') {
+            steps {
+                sh 'mvn checkstyle:check'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Code Coverage') {
+            steps {
+                sh 'mvn jacoco:report'
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                sh 'scp target/${ARTIFACT_NAME} $STAGING_SERVER:${REMOTE_PATH}/'
+                sh 'ssh $STAGING_SERVER "nohup java -jar ${REMOTE_PATH}/${ARTIFACT_NAME} > ${REMOTE_PATH}/app.log 2>&1 &"'
+            }
+        }
+        stage('Validate Deployment') {
+            steps {
+                sh 'sleep 10'
+                sh 'curl --fail http://maven-ssh:8080/health'
+            }
+        }
     }
-   
-  }
-  post {
-    always {
-      junit '**/target/surefire-reports/*.xml'
-      archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-    }
-  }
 }
