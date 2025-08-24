@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        STAGING_SERVER = 'user@your-staging-server'
+        STAGING_SERVER = 'dockeruser@maven-ssh'
         ARTIFACT_NAME = 'demo-0.0.1-SNAPSHOT.jar'
     }
     stages {
