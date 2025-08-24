@@ -34,7 +34,7 @@ pipeline {
         }
         stage('Deploy to Staging') {
             steps {
-                  sshagent(['maven-ssh-key']) {
+                  sshagent(['servidor']) {
                     sh "scp target/${ARTIFACT_NAME} dockeruser@maven-ssh:${REMOTE_PATH}/"
                     sh "ssh dockeruser@maven-ssh 'nohup java -jar ${REMOTE_PATH}/${ARTIFACT_NAME} > ${REMOTE_PATH}/app.log 2>&1 &'"
                 }
