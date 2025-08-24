@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment {
+        PATH = "/opt/maven/bin:$PATH"
         STAGING_SERVER = 'dockeruser@maven-ssh'
         ARTIFACT_NAME = 'demo-0.0.1-SNAPSHOT.jar'
         REMOTE_PATH = '/home/dockeruser/projects'
