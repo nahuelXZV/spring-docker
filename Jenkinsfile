@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/your-org/your-springboot-repo.git'
+                git 'https://github.com/nahuelXZV/spring-docker/'
             }
         }
         stage('Build') {
